@@ -2,21 +2,19 @@ import java.io.IOException;
 
 public class Bruteforce {
     public static int brute(StringBuilder sourceText) throws IOException {
-        System.out.println("\nНачинаю брутфорс\n");
-        //StringBuilder encodedText = new StringBuilder();
         int keyFinal = 0;
-        for (int key = 0; key < Const.alphabet.length; key++) {
+        for (int key = -Const.alphabet.length/2-1; key < Const.alphabet.length/2+1; key++) {
             StringBuilder bruteString = Encoder.encode(sourceText, key);
             String[] brute = bruteString.toString().split(" ");
             for (String word : brute) {
                 for (int i = 0; i < Const.keyWords.length; i++) {
                     if (Const.keyWords[i].equalsIgnoreCase(word)) {
-                        keyFinal = key;
+                        keyFinal = key;break;
                     }
                 }
             }
         }
-        System.out.println("Ключ брутфорса = " + keyFinal);
+        System.out.println("\nКлюч = " + (keyFinal));
 
         return keyFinal;
     }
