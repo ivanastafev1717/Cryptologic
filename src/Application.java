@@ -6,56 +6,96 @@ public class Application {
 
     public static void main(String[] args) throws IOException {
 
-        /** Выбираем что будем делать */
-        System.out.println("Что нужно сделать? Введите число:\n1 - Шифрование\n2 - Дешифрование\n3 - Брутфорс");
+        // Выбираем что будем делать
+
+        System.out.println("Что нужно сделать? " + Const.WELCOME_MESSAGE);
         Scanner scanner = new Scanner(System.in);
-        int numberFromConsole = Integer.parseInt(scanner.nextLine());
 
+        String numberFromConsoleString = scanner.nextLine();
+        while (!isCorrectNumber(numberFromConsoleString)) {
+            numberFromConsoleString = scanner.nextLine();
+        }
+        int numberFromConsole = Integer.parseInt(numberFromConsoleString);
 
-        /** Читаем файл -  */
+        // Вводим путь
 
         System.out.println("\nВведите путь до файла:");
-        FileInputStream fileInputFile = new FileInputStream(scanner.nextLine());
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fileInputFile, StandardCharsets.UTF_8));
+        String pathFile = scanner.nextLine();
+        File file = new File(pathFile);
 
-        /** Переводим почему-то текст файл в StringBuilder -  */
+        BufferedReader reader = null;
+        FileInputStream fileInputFile = null;
+
+        // Проверка на правильность пути
+
+        while (!file.exists()) {
+            System.out.println("Файл не найден");
+            file = new File(scanner.nextLine());
+        }
+        try {
+            fileInputFile = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+
+        }
+
+        reader = new BufferedReader(new InputStreamReader(fileInputFile, StandardCharsets.UTF_8));
+
+
+        // Переводим почему-то текст файл в StringBuilder
 
         int i;
         StringBuilder textInputStringBuilder = new StringBuilder();
         while ((i = reader.read()) != -1) {
             textInputStringBuilder.append((char) i);
         }
-
-
         FileOutputStream fileOutputStream = new FileOutputStream("test/coded.txt");
 
-        /** Шифрование с ключем -  */
+        // Зашифрование с ключем
 
         if (numberFromConsole == 1) {
-            System.out.println("\nВведите ключ:");
-            int key = Integer.parseInt(scanner.nextLine());
+            int key = keyInput();
             StringBuilder textEncoded = Encoder.encode(textInputStringBuilder, key);
             fileOutputStream.write(textEncoded.substring(0).getBytes());
             System.out.println("Файл зашифрован и записан в test/coded.txt");
         }
 
-        /** Дешифрование с ключем -  */
+        // Дешифрование с ключем
 
         if (numberFromConsole == 2) {
-            System.out.println("\nВведите ключ:");
-            int key = Integer.parseInt(scanner.nextLine());
-            StringBuilder textEncoded = Encoder.encode(textInputStringBuilder, key);
+            int key = keyInput();
+            StringBuilder textEncoded = Encoder.encode(textInputStringBuilder, -key);
             fileOutputStream.write(textEncoded.substring(0).getBytes());
             System.out.println("Файл дешифрован и записан в test/coded.txt");
         }
 
-        /** Брутфорс по ключевым словам -  */
+        // Брутфорс по ключевым словам
 
         if (numberFromConsole == 3) {
-            StringBuilder textEncoded = Encoder.encode(textInputStringBuilder,Bruteforce.brute(textInputStringBuilder));
+            StringBuilder textEncoded = Encoder.encode(textInputStringBuilder, Bruteforce.brute(textInputStringBuilder));
             fileOutputStream.write(textEncoded.substring(0).getBytes());
             System.out.println("Файл взломан и записан в test/coded.txt");
         }
 
     }
+
+    public static boolean isCorrectNumber(String str) {
+        try {
+            int number = Integer.parseInt(str);
+            return isNumber(number);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    public static boolean isNumber(int number) {
+        return number == 1 || number == 2 || number == 3;
+    }
+
+    public static int keyInput() {
+        System.out.println("\nВведите ключ:");
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextInt();
+    }
+
+
 }
